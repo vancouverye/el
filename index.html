@@ -3,149 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>우리아빠 영어교실</title>
+    <title>아빠의 영어 놀이터</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* 화면 디자인 (CSS) : 아버님을 위해 큼직하고 깔끔하게! */
-        body { font-family: 'Malgun Gothic', sans-serif; background-color: #f0f2f5; margin: 0; color: #333; }
-        header { background-color: #4CAF50; color: white; text-align: center; padding: 25px; font-size: 28px; font-weight: bold; }
-        
-        /* 상단 탭 메뉴 디자인 */
-        .tab-menu { display: flex; background-color: #333; }
-        .tab-menu button { flex: 1; padding: 15px; font-size: 20px; color: white; background: none; border: none; cursor: pointer; }
-        .tab-menu button:hover { background-color: #555; }
-        .tab-menu button.active { background-color: #4CAF50; font-weight: bold; }
-
-        /* 메인 내용 영역 */
-        .content-area { max-width: 800px; margin: 30px auto; padding: 30px; background-color: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .tab-content { display: none; } /* 기본적으로 내용은 숨김 */
-        .tab-content.active { display: block; } /* 선택된 탭만 보임 */
-
-        h2 { color: #2E7D32; font-size: 26px; }
-        p { font-size: 20px; line-height: 1.6; }
-        
-        /* 퀴즈 및 입력창 디자인 */
-        .question-box { background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        input[type="text"] { width: 80%; padding: 15px; font-size: 20px; border: 2px solid #ccc; border-radius: 8px; margin-top: 10px; }
-        .action-btn { background-color: #008CBA; color: white; border: none; padding: 15px 30px; font-size: 20px; border-radius: 8px; cursor: pointer; margin-top: 15px; }
-        .action-btn:hover { background-color: #006080; }
-        
-        /* 포인트 표시 */
-        .point-display { text-align: right; font-size: 22px; font-weight: bold; color: #FF9800; margin-top: -10px; padding-bottom: 10px;}
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700&display=swap');
+        body { font-family: 'Pretendard', sans-serif; transition: background-color 0.3s; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        .tab-active { color: #10b981; border-bottom: 3px solid #10b981; }
+        .badge-locked { filter: grayscale(1); opacity: 0.5; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 min-h-screen pb-20">
 
-    <header>🎉 아빠를 위한 즐거운 영어교실 🎉</header>
-
-    <div class="tab-menu">
-        <button class="tab-link active" onclick="openTab(event, 'Concept')">1. 개념 학습</button>
-        <button class="tab-link" onclick="openTab(event, 'Quiz')">2. 퀴즈 & 평가</button>
-        <button class="tab-link" onclick="openTab(event, 'Music')">3. 음악 & 받아쓰기</button>
-    </div>
-
-    <div class="content-area">
-        <div class="point-display">내 포인트: <span id="user-score">0</span> 점 🏆</div>
-
-        <div id="Concept" class="tab-content active">
-            <h2>오늘의 영어: 식당에서 주문하기</h2>
-            <p>아빠, 오늘은 식당에서 자신 있게 메뉴를 주문하는 방법을 배워볼게요.</p>
-            <div class="question-box">
-                <p><strong>"이것 좀 주시겠어요?"</strong> 라고 정중하게 말할 때는<br>
-                <strong style="color:red; font-size: 24px;">"Can I have ~?"</strong> 를 사용합니다.</p>
-                <p>예시: Can I have a menu? (메뉴판 좀 주시겠어요?)</p>
+    <header class="sticky top-0 z-10 bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-emerald-600 flex items-center gap-2">
+            <i data-lucide="graduation-cap"></i> 아빠의 영어교실
+        </h1>
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <p class="text-xs text-slate-500 font-bold">현재 포인트</p>
+                <p id="score-display" class="text-xl font-black text-orange-500">0</p>
             </div>
-            <p>이 개념을 잘 기억하시고, 다음 [퀴즈 & 평가] 탭으로 넘어가 보세요!</p>
+            <button onclick="toggleTab('Settings')" class="p-2 hover:bg-slate-100 rounded-full">
+                <i data-lucide="settings"></i>
+            </button>
         </div>
+    </header>
 
-        <div id="Quiz" class="tab-content">
-            <h2>실력 점검 평가 (포인트 획득!)</h2>
-            <p>방금 배운 내용을 바탕으로 퀴즈를 풀어보세요. 맞히면 50포인트를 드립니다!</p>
-            <div class="question-box">
-                <p><strong>문제:</strong> "물 한 잔 주시겠어요?"를 영어로 바르게 쓴 것은?</p>
-                <input type="radio" name="q1" value="wrong" id="a1"> <label for="a1" style="font-size: 20px;">1. Give me water.</label><br><br>
-                <input type="radio" name="q1" value="correct" id="a2"> <label for="a2" style="font-size: 20px;">2. Can I have some water?</label><br><br>
+    <main class="max-w-md mx-auto p-6">
+        
+        <section id="Tab-Concept" class="tab-content space-y-6">
+            <div class="glass-card p-6 rounded-3xl shadow-xl border border-white">
+                <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold">STEP 01</span>
+                <h2 class="text-2xl font-bold mt-3 mb-2">식당에서 주문하기 🍔</h2>
+                <p class="text-slate-600 leading-relaxed text-lg">
+                    아빠, 외국 식당에서 당황하지 마세요! <br>
+                    <span class="text-emerald-600 font-bold underline">"Can I have ~?"</span> <br>
+                    이 문장 하나면 모든 주문이 가능해요.
+                </p>
+                <div class="mt-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 italic text-emerald-800">
+                    "Can I have a cheeseburger, please?"
+                </div>
             </div>
-            <button class="action-btn" onclick="checkQuiz()">정답 확인 및 평가 완료</button>
-            <p id="quiz-result" style="font-weight: bold; margin-top: 15px;"></p>
-        </div>
+        </section>
 
-        <div id="Music" class="tab-content">
-            <h2>팝송 듣고 빈칸 채우기</h2>
-            <p>명곡 <strong>'Yesterday'</strong>를 듣고 빈칸에 들어갈 단어를 적어보세요. (정답: yesterday)</p>
+        <section id="Tab-Quiz" class="tab-content hidden space-y-6">
+            <div class="glass-card p-6 rounded-3xl shadow-xl border border-white">
+                <h2 class="text-2xl font-bold mb-6">오늘의 퀴즈 ✏️</h2>
+                <div class="space-y-4">
+                    <button onclick="checkQuiz(this, false)" class="w-full p-4 text-left border-2 border-slate-200 rounded-2xl hover:border-emerald-500 transition-all text-lg">
+                        1. Give me some water.
+                    </button>
+                    <button onclick="checkQuiz(this, true)" class="w-full p-4 text-left border-2 border-slate-200 rounded-2xl hover:border-emerald-500 transition-all text-lg">
+                        2. Can I have some water?
+                    </button>
+                </div>
+                <div id="quiz-feedback" class="mt-6 text-center font-bold hidden"></div>
+            </div>
+        </section>
+
+        <section id="Tab-Music" class="tab-content hidden space-y-6">
+            <div class="glass-card p-6 rounded-3xl shadow-xl border border-white text-center">
+                <h2 class="text-2xl font-bold mb-4">팝송 받아쓰기 🎶</h2>
+                <div class="bg-slate-900 rounded-2xl p-4 mb-6">
+                    <audio controls class="w-full">
+                        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                    </audio>
+                </div>
+                <p class="text-slate-500 mb-4 font-medium">가사를 듣고 빈칸을 채워보세요!</p>
+                <div class="flex flex-col gap-3">
+                    <input id="lyrics-input" type="text" placeholder="Yesterday..." class="w-full p-4 rounded-2xl border-2 border-slate-100 focus:border-emerald-500 outline-none text-center text-xl">
+                    <button onclick="checkLyrics()" class="w-full py-4 bg-emerald-500 text-white rounded-2xl font-bold text-lg shadow-lg shadow-emerald-200">정답 확인</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="Tab-Settings" class="tab-content hidden space-y-6">
+            <div class="glass-card p-6 rounded-3xl shadow-xl border border-white">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-2"><i data-lucide="award"></i> 획득한 배지</h2>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div id="badge-1" class="badge-locked">
+                        <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto text-2xl">🌱</div>
+                        <p class="text-xs mt-2 font-bold text-slate-500">첫걸음</p>
+                    </div>
+                    <div id="badge-2" class="badge-locked">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto text-2xl">💎</div>
+                        <p class="text-xs mt-2 font-bold text-slate-500">퀴즈왕</p>
+                    </div>
+                    <div id="badge-3" class="badge-locked">
+                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto text-2xl">🎤</div>
+                        <p class="text-xs mt-2 font-bold text-slate-500">가수왕</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-6 rounded-3xl shadow-xl border border-white">
+                <h2 class="text-xl font-bold mb-4">앱 설정</h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">다크 모드</span>
+                        <input type="checkbox" class="toggle">
+                    </div>
+                    <button onclick="resetData()" class="w-full py-3 text-red-500 border border-red-200 rounded-xl text-sm font-bold">모든 데이터 초기화</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-3 px-2">
+        <button onclick="toggleTab('Concept')" class="nav-btn tab-active flex flex-col items-center gap-1">
+            <i data-lucide="book-open" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold">배우기</span>
+        </button>
+        <button onclick="toggleTab('Quiz')" class="nav-btn text-slate-400 flex flex-col items-center gap-1">
+            <i data-lucide="pen-tool" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold">테스트</span>
+        </button>
+        <button onclick="toggleTab('Music')" class="nav-btn text-slate-400 flex flex-col items-center gap-1">
+            <i data-lucide="music" class="w-6 h-6"></i>
+            <span class="text-[10px] font-bold">음악듣기</span>
+        </button>
+    </nav>
+
+    <script type="module">
+        // --- 1. Firebase 설정 (여기에 자신의 정보를 넣으세요) ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyAX_k1I9YGSp8WTlnckpc83nGwxFs0n_qU",
+  authDomain: "ellearning-bdb4d.firebaseapp.com",
+  projectId: "ellearning-bdb4d",
+  storageBucket: "ellearning-bdb4d.firebasestorage.app",
+  messagingSenderId: "90357324973",
+  appId: "1:90357324973:web:ca3d81e60304ddf31afa24",
+  measurementId: "G-LTKK3362T8"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- 2. 로컬 데이터 관리 및 UI 로직 ---
+        window.userData = {
+            points: 0,
+            badges: []
+        };
+
+        window.toggleTab = (tabName) => {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(`Tab-${tabName}`).classList.remove('hidden');
             
-            <audio controls style="width: 100%; margin-bottom: 20px;">
-                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-                브라우저가 오디오를 지원하지 않습니다.
-            </audio>
+            // 버튼 스타일 변경
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('tab-active', 'text-emerald-600'));
+            // 이벤트 타겟을 찾기 힘드므로 단순화된 로직 적용 가능
+        };
 
-            <div class="question-box">
-                <p>🎵 <input type="text" id="lyrics-input" placeholder="여기에 영어 단어를 입력하세요"> , all my troubles seemed so far away 🎵</p>
-            </div>
-            <button class="action-btn" onclick="checkLyrics()">가사 제출하기 (100포인트)</button>
-            <p id="lyrics-result" style="font-weight: bold; margin-top: 15px;"></p>
-        </div>
-    </div>
+        window.updatePoint = (amount) => {
+            userData.points += amount;
+            document.getElementById('score-display').innerText = userData.points;
+            checkBadges();
+            // Firebase에 저장하는 로직을 여기에 추가 (setDoc)
+        };
 
-    <script>
-        let currentScore = 0; // 초기 점수
-
-        // 탭 전환 기능
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].classList.remove("active");
-            }
-            tablinks = document.getElementsByClassName("tab-link");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].classList.remove("active");
-            }
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-        }
-
-        // 퀴즈 채점 기능
-        function checkQuiz() {
-            let options = document.getElementsByName("q1");
-            let resultText = document.getElementById("quiz-result");
-            
-            for(let i=0; i < options.length; i++){
-                if(options[i].checked){
-                    if(options[i].value === "correct"){
-                        resultText.style.color = "blue";
-                        resultText.innerText = "🎉 대단해요 아빠! 정답입니다! (+50 포인트)";
-                        updateScore(50);
-                    } else {
-                        resultText.style.color = "red";
-                        resultText.innerText = "😅 아쉽네요, 'Can I have ~' 패턴을 다시 떠올려보세요!";
-                    }
-                    return;
-                }
-            }
-            alert("답을 선택해주세요!");
-        }
-
-        // 가사 받아쓰기 채점 기능
-        function checkLyrics() {
-            let answer = document.getElementById("lyrics-input").value.toLowerCase().trim();
-            let resultText = document.getElementById("lyrics-result");
-
-            if(answer === "yesterday") {
-                resultText.style.color = "blue";
-                resultText.innerText = "🎤 완벽합니다! 귀가 뻥 뚫리셨네요! (+100 포인트)";
-                updateScore(100);
+        window.checkQuiz = (btn, isCorrect) => {
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.remove('hidden');
+            if(isCorrect) {
+                btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
+                feedback.innerText = "🎉 정답입니다! (+100점)";
+                feedback.className = "mt-6 text-center font-bold text-emerald-600";
+                updatePoint(100);
+                unlockBadge(2);
             } else {
-                resultText.style.color = "red";
-                resultText.innerText = "❌ 조금 다릅니다. 음악을 다시 한번 천천히 들어보세요.";
+                btn.classList.add('bg-red-50', 'border-red-500');
+                feedback.innerText = "❌ 다시 한번 생각해보세요!";
+                feedback.className = "mt-6 text-center font-bold text-red-500";
             }
+        };
+
+        window.checkLyrics = () => {
+            const val = document.getElementById('lyrics-input').value.toLowerCase().trim();
+            if(val === 'yesterday') {
+                alert('최고예요! 가사를 맞히셨습니다.');
+                updatePoint(200);
+                unlockBadge(3);
+            } else {
+                alert('조금만 더 집중해서 들어보세요!');
+            }
+        };
+
+        function unlockBadge(id) {
+            const badge = document.getElementById(`badge-${id}`);
+            badge.classList.remove('badge-locked');
+            if(!userData.badges.includes(id)) userData.badges.push(id);
         }
 
-        // 점수 업데이트 (이 부분을 나중에 Firebase와 연결하면 됩니다)
-        function updateScore(points) {
-            currentScore += points;
-            document.getElementById("user-score").innerText = currentScore;
+        function checkBadges() {
+            if(userData.points > 0) unlockBadge(1);
         }
+
+        window.resetData = () => {
+            if(confirm('모든 학습 기록을 초기화할까요?')) {
+                location.reload();
+            }
+        };
+
+        // 아이콘 초기화
+        lucide.createIcons();
     </script>
-
 </body>
 </html>
