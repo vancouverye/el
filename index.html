@@ -3,123 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>아빠의 영어 놀이터</title>
+    <title>아빠의 영어 마스터</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap');
-        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        /* 스크롤바 숨기기 */
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        .course-card.locked { filter: grayscale(100%); opacity: 0.6; pointer-events: none; }
+        .progress-bar { transition: width 0.3s ease; }
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="text-slate-900 min-h-screen">
+<body class="text-slate-900 min-h-screen pb-24">
 
-    <div id="auth-screen" class="min-h-screen flex flex-col items-center justify-center p-6 bg-emerald-50">
+    <div id="auth-screen" class="min-h-screen flex flex-col items-center justify-center p-6 bg-blue-50">
         <div class="glass p-8 rounded-3xl shadow-xl w-full max-w-sm text-center">
-            <i data-lucide="graduation-cap" class="w-16 h-16 text-emerald-500 mx-auto mb-4"></i>
-            <h1 class="text-2xl font-black mb-6 text-slate-800">아빠의 영어교실</h1>
+            <i data-lucide="globe" class="w-16 h-16 text-blue-500 mx-auto mb-4"></i>
+            <h1 class="text-3xl font-black mb-2 text-slate-800">영어 마스터</h1>
+            <p class="text-slate-500 mb-8 font-bold">아빠의 새로운 도전을 응원합니다!</p>
             
             <div id="login-form" class="space-y-4">
-                <input type="email" id="email" placeholder="이메일 주소" class="w-full p-4 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none">
-                <input type="password" id="password" placeholder="비밀번호 (6자리 이상)" class="w-full p-4 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none">
-                
-                <button onclick="handleLogin()" class="w-full py-4 bg-emerald-500 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-600">로그인하기</button>
-                <button onclick="handleSignUp()" class="w-full py-4 bg-slate-800 text-white font-bold rounded-xl shadow-lg hover:bg-slate-900">새로 가입하기</button>
+                <input type="email" id="email" placeholder="이메일 주소" class="w-full p-4 rounded-xl border border-slate-200 focus:border-blue-500 outline-none font-bold">
+                <input type="password" id="password" placeholder="비밀번호 (6자리 이상)" class="w-full p-4 rounded-xl border border-slate-200 focus:border-blue-500 outline-none font-bold">
+                <button onclick="handleLogin()" class="w-full py-4 bg-blue-600 text-white font-black rounded-xl shadow-lg hover:bg-blue-700 text-lg">로그인</button>
+                <button onclick="handleSignUp()" class="w-full py-4 bg-slate-800 text-white font-black rounded-xl shadow-lg hover:bg-slate-900 text-lg">새로 가입하기</button>
             </div>
             <p id="auth-error" class="text-red-500 mt-4 text-sm font-bold hidden"></p>
         </div>
     </div>
 
-    <div id="main-app" class="hidden pb-24">
-        <header class="bg-white p-5 shadow-sm sticky top-0 z-50 flex justify-between items-center border-b border-slate-100">
-            <h1 class="text-xl font-black text-emerald-600 flex items-center gap-2">
-                <i data-lucide="book-open" class="w-6 h-6"></i> 영어교실
+    <div id="main-app" class="hidden">
+        <header class="bg-white p-5 shadow-sm sticky top-0 z-40 flex justify-between items-center">
+            <h1 class="text-xl font-black text-blue-600 flex items-center gap-2">
+                <i data-lucide="book-open"></i> 강좌 목록
             </h1>
-            <div class="flex items-center gap-4">
-                <div class="text-right">
-                    <span class="text-[10px] font-bold text-slate-400 block -mb-1">내 포인트</span>
-                    <span id="user-points" class="text-xl font-black text-orange-500">0</span>
-                </div>
-                <button onclick="handleLogout()" class="p-2 bg-slate-100 rounded-full text-slate-500 hover:text-red-500">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                </button>
+            <div class="text-right">
+                <span class="text-[10px] font-bold text-slate-400 block -mb-1">총 포인트</span>
+                <span id="user-points" class="text-xl font-black text-orange-500">0</span>
             </div>
         </header>
 
         <main class="max-w-md mx-auto p-4">
-            <section id="Tab-Learn" class="tab-content space-y-4">
-                <h2 class="text-xl font-bold mb-2">오늘의 진도 📖</h2>
-                <div class="glass p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="font-bold text-lg text-emerald-700">1강. 식당 주문 마스터</h3>
-                    <p class="text-slate-600 mt-2 mb-4 leading-relaxed">
-                        식당에서 메뉴를 부탁할 때는 <b>"Can I have ~?"</b>를 기억하세요!<br>
-                        예) Can I have some water? (물 좀 주시겠어요?)
-                    </p>
-                    <div class="p-4 bg-orange-50 rounded-xl border border-orange-100">
-                        <p class="text-sm font-bold text-orange-600 mb-2">💡 미니 퀴즈</p>
-                        <p class="mb-3 font-medium">"메뉴판 좀 주시겠어요?"는 영어로?</p>
-                        <button onclick="alert('정답입니다!'); addPoints(10);" class="block w-full text-left p-3 bg-white border border-slate-200 rounded-lg mb-2 hover:border-emerald-500">1. Can I have a menu?</button>
-                        <button onclick="alert('틀렸습니다. Can I have를 써보세요.');" class="block w-full text-left p-3 bg-white border border-slate-200 rounded-lg hover:border-red-500">2. Give me menu.</button>
-                    </div>
+            
+            <section id="Tab-Course" class="tab-content space-y-6">
+                <div class="bg-blue-600 text-white p-6 rounded-3xl shadow-lg mb-6">
+                    <h2 class="text-2xl font-black mb-1">Beginner to Native!</h2>
+                    <p class="text-blue-100 text-sm font-bold">순서대로 강좌를 클리어하세요.</p>
                 </div>
+                <div id="course-list" class="space-y-4">
+                    </div>
             </section>
 
-            <section id="Tab-Test" class="tab-content hidden space-y-4">
-                <h2 class="text-xl font-bold mb-2">실력 평가 테스트 📝</h2>
-                <div class="glass p-6 rounded-2xl shadow-sm border-2 border-slate-800 text-center">
-                    <i data-lucide="award" class="w-12 h-12 text-orange-500 mx-auto mb-3"></i>
-                    <h3 class="font-bold text-xl mb-2">1단계 종합 시험</h3>
-                    <p class="text-slate-500 text-sm mb-6">지금까지 배운 내용을 총동원해 보세요.<br>100점을 맞으면 500포인트를 드립니다!</p>
-                    <button onclick="startTest()" class="w-full py-4 bg-slate-800 text-white font-bold rounded-xl">시험 시작하기</button>
-                </div>
+            <section id="Tab-Quest" class="tab-content hidden space-y-4">
+                <h2 class="text-2xl font-black mb-4 px-2 text-slate-800">일일 미션 & 업적 🏆</h2>
+                <div id="quest-list" class="space-y-3">
+                    </div>
             </section>
 
             <section id="Tab-Music" class="tab-content hidden space-y-4">
-                <h2 class="text-xl font-bold mb-2">팝송으로 배우는 영어 🎧</h2>
-                <p class="text-sm text-slate-500 mb-4">노래를 선택하고 가사 빈칸을 채워보세요!</p>
-                <div id="song-list" class="space-y-3">
-                    </div>
-
-                <div id="music-player" class="hidden glass p-6 rounded-2xl shadow-xl border border-emerald-100 mt-6">
-                    <h3 id="player-title" class="font-bold text-xl text-emerald-700 mb-1">제목</h3>
-                    <p id="player-artist" class="text-sm text-slate-500 mb-4">가수</p>
-                    
-                    <audio id="audio-element" controls class="w-full mb-6"></audio>
-                    
-                    <div class="bg-slate-800 p-5 rounded-xl text-white text-center">
-                        <p id="lyrics-question" class="mb-4 text-lg font-medium leading-relaxed">...</p>
-                        <input type="text" id="lyrics-answer" placeholder="빈칸에 들어갈 단어는?" class="w-full p-3 rounded-lg text-black text-center font-bold text-lg outline-none focus:ring-4 focus:ring-emerald-500">
-                        <button onclick="checkLyrics()" class="w-full mt-4 py-3 bg-emerald-500 text-white font-bold rounded-lg hover:bg-emerald-600">정답 제출 (100P)</button>
-                    </div>
-                    <button onclick="closePlayer()" class="w-full mt-4 py-2 text-slate-500 font-bold text-sm">목록으로 돌아가기</button>
-                </div>
+                <h2 class="text-2xl font-black mb-4 px-2 text-slate-800">팝송 리스닝 🎧</h2>
+                <div id="song-list" class="space-y-3"></div>
             </section>
         </main>
 
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around py-3 px-2 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-            <button onclick="changeTab('Learn')" class="nav-btn tab-Learn text-emerald-600 flex flex-col items-center gap-1">
-                <i data-lucide="book-open" class="w-6 h-6"></i><span class="text-[10px] font-bold">강좌/퀴즈</span>
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around py-3 px-2 z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+            <button onclick="changeTab('Course')" class="nav-btn tab-Course text-blue-600 flex flex-col items-center gap-1">
+                <i data-lucide="layers" class="w-6 h-6"></i><span class="text-[10px] font-bold">강좌</span>
             </button>
-            <button onclick="changeTab('Test')" class="nav-btn tab-Test text-slate-400 flex flex-col items-center gap-1">
-                <i data-lucide="file-edit" class="w-6 h-6"></i><span class="text-[10px] font-bold">평가테스트</span>
+            <button onclick="changeTab('Quest')" class="nav-btn tab-Quest text-slate-400 flex flex-col items-center gap-1">
+                <i data-lucide="target" class="w-6 h-6"></i><span class="text-[10px] font-bold">퀘스트</span>
             </button>
             <button onclick="changeTab('Music')" class="nav-btn tab-Music text-slate-400 flex flex-col items-center gap-1">
-                <i data-lucide="headphones" class="w-6 h-6"></i><span class="text-[10px] font-bold">음악듣기</span>
+                <i data-lucide="music" class="w-6 h-6"></i><span class="text-[10px] font-bold">음악</span>
             </button>
         </nav>
     </div>
 
+    <div id="course-player" class="hidden fixed inset-0 bg-slate-50 z-50 flex flex-col">
+        <header class="bg-white p-4 shadow-sm flex justify-between items-center">
+            <button onclick="exitCourse()" class="text-slate-500 font-bold flex items-center"><i data-lucide="chevron-left"></i> 나가기</button>
+            <div id="player-mode-title" class="font-black text-blue-600">개념 학습</div>
+            <div class="w-8"></div>
+        </header>
+
+        <div class="h-2 bg-slate-200 w-full"><div id="progress-bar" class="h-full bg-blue-500 progress-bar" style="width: 0%;"></div></div>
+
+        <main class="flex-1 overflow-y-auto p-6 flex flex-col justify-center max-w-md mx-auto w-full">
+            <div id="view-concept" class="hidden text-center">
+                <div class="text-sm font-bold text-slate-400 mb-4" id="concept-counter">1 / 15</div>
+                <div class="glass p-8 rounded-3xl shadow-xl min-h-[300px] flex items-center justify-center text-xl font-medium leading-relaxed" id="concept-content">
+                    개념 내용
+                </div>
+                <div class="flex gap-4 mt-8">
+                    <button id="btn-prev-concept" onclick="prevConcept()" class="flex-1 py-4 bg-slate-200 text-slate-600 rounded-2xl font-black">이전</button>
+                    <button id="btn-next-concept" onclick="nextConcept()" class="flex-1 py-4 bg-blue-500 text-white rounded-2xl font-black shadow-lg">다음</button>
+                </div>
+            </div>
+
+            <div id="view-quiz" class="hidden text-center">
+                <div class="text-sm font-bold text-orange-500 mb-4" id="quiz-counter">Q 1 / 15</div>
+                <h3 class="text-2xl font-black mb-8" id="quiz-question">질문</h3>
+                <div id="quiz-options" class="space-y-4"></div>
+            </div>
+
+            <div id="view-test" class="hidden text-center">
+                <i data-lucide="award" class="w-16 h-16 text-purple-500 mx-auto mb-4"></i>
+                <h2 class="text-2xl font-black mb-2 text-purple-700">최종 테스트</h2>
+                <p class="text-slate-500 font-bold mb-8 text-sm">이 테스트를 통과해야 다음 강좌가 열립니다.</p>
+                <div class="text-sm font-bold text-purple-500 mb-4" id="test-counter">T 1 / 5</div>
+                <h3 class="text-xl font-black mb-8" id="test-question">질문</h3>
+                <div id="test-options" class="space-y-4"></div>
+            </div>
+        </main>
+    </div>
+
     <script type="module">
-        // ⭐️ [필수] 본인의 Firebase Config 값으로 교체하세요!
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // 🔥 본인의 Firebase Config 입력
         const firebaseConfig = {
   apiKey: "AIzaSyAX_k1I9YGSp8WTlnckpc83nGwxFs0n_qU",
   authDomain: "ellearning-bdb4d.firebaseapp.com",
+  databaseURL: "https://ellearning-bdb4d-default-rtdb.firebaseio.com",
   projectId: "ellearning-bdb4d",
   storageBucket: "ellearning-bdb4d.firebasestorage.app",
   messagingSenderId: "90357324973",
@@ -132,156 +140,362 @@
         const db = getFirestore(app);
 
         let currentUser = null;
-        let userData = { points: 0 };
+        let userData = { points: 0, completedCourses: [], questsCompleted: [] };
 
-        // --- Auth (로그인/회원가입) 로직 ---
+        // --------------------------------------------------------
+        // 📚 대규모 강좌 데이터 (15개 슬라이드 + 15개 퀴즈 + 테스트 분리)
+        // --------------------------------------------------------
+        const courses = [
+            {
+                id: 1, level: "Beginner", title: "Level 1. 왕초보 인사와 소개",
+                concepts: [
+                    "1. 가장 기본 인사입니다. <b>Hello!</b> (안녕하세요)",
+                    "2. 아침 인사: <b>Good morning!</b>",
+                    "3. 점심 인사: <b>Good afternoon!</b>",
+                    "4. 저녁 인사: <b>Good evening!</b>",
+                    "5. 헤어질 때: <b>Goodbye!</b> 또는 <b>Bye!</b>",
+                    "6. 안부 묻기: <b>How are you?</b> (어떻게 지내세요?)",
+                    "7. 대답: <b>I'm fine, thank you.</b> (잘 지냅니다, 감사합니다.)",
+                    "8. 짧은 대답: <b>Good! And you?</b> (좋아요! 당신은요?)",
+                    "9. 이름 묻기: <b>What is your name?</b> (이름이 뭐예요?)",
+                    "10. 내 이름 말하기: <b>My name is [이름].</b>",
+                    "11. 나 소개하기: <b>I am a father.</b> (나는 아빠입니다.)",
+                    "12. 반가울 때: <b>Nice to meet you.</b> (만나서 반가워요.)",
+                    "13. 출신 묻기: <b>Where are you from?</b> (어디서 오셨어요?)",
+                    "14. 출신 답하기: <b>I am from Korea.</b> (한국에서 왔습니다.)",
+                    "15. 축하합니다! 인사말 15개의 개념을 모두 배우셨습니다. 이제 퀴즈로 넘어갑니다."
+                ],
+                quizzes: [
+                    { q: "가장 기본적인 인사말은?", opts: ["Hello", "Sorry"], a: 0 },
+                    { q: "아침에 하는 인사는?", opts: ["Good evening", "Good morning"], a: 1 },
+                    { q: "헤어질 때 하는 인사는?", opts: ["Goodbye", "Hello"], a: 0 },
+                    { q: "'How are you?'의 뜻은?", opts: ["이름이 뭐예요?", "어떻게 지내세요?"], a: 1 },
+                    { q: "저녁 인사는?", opts: ["Good evening", "Good morning"], a: 0 },
+                    { q: "이름을 물어볼 때 쓰는 말은?", opts: ["What is your name?", "How are you?"], a: 0 },
+                    { q: "'나는 한국에서 왔습니다'를 영어로?", opts: ["I am from Korea", "I am Korea"], a: 0 },
+                    { q: "'만나서 반가워요'는 영어로?", opts: ["Nice to meet you", "Thank you"], a: 0 },
+                    { q: "I'm fine 다음의 예의 바른 말은?", opts: ["thank you", "no"], a: 0 },
+                    { q: "'내 이름은 존입니다'를 영어로?", opts: ["My name is John", "You are John"], a: 0 },
+                    { q: "Where are you from? 의 뜻은?", opts: ["어디서 오셨어요?", "어디 가세요?"], a: 0 },
+                    { q: "오후 인사는?", opts: ["Good afternoon", "Good night"], a: 0 },
+                    { q: "'좋아요! 당신은요?' 짧게 말하면?", opts: ["Good! And you?", "Bad!"], a: 0 },
+                    { q: "자기 자신을 소개할 때 시작하는 말은?", opts: ["I am...", "You are..."], a: 0 },
+                    { q: "'나는 아빠입니다'를 영어로?", opts: ["I am a father", "He is a father"], a: 0 }
+                ],
+                test: [
+                    { q: "누군가를 처음 만났을 때 완벽한 대화 순서로 알맞은 것은?", opts: ["Hello -> Nice to meet you", "Goodbye -> Hello"], a: 0 },
+                    { q: "상대방의 안부를 묻고 내 상태를 말할 때?", opts: ["How are you? -> I'm fine.", "What is your name? -> I am fine."], a: 0 },
+                    { q: "해외 여행 중 출입국 심사에서 직원이 'Where are you from?' 이라 물었다. 대답은?", opts: ["I am from Korea.", "My name is Korea."], a: 0 }
+                ]
+            },
+            {
+                id: 2, level: "Beginner", title: "Level 2. 식당 주문 완벽 마스터",
+                concepts: [
+                    "1. 식당에 들어갈 때: <b>Two people, please.</b> (두 명이요.)",
+                    "2. 메뉴판 요청: <b>Can I have a menu?</b>",
+                    "3. 핵심 마법의 단어: 무언가 원할 땐 무조건 <b>'Can I have ~?'</b>",
+                    "4. 물 요청: <b>Can I have some water?</b>",
+                    "5. 주문할게요: <b>I'm ready to order.</b>",
+                    "6. 이거 주세요: <b>I will have this.</b> (메뉴를 가리키며)",
+                    "7. 스테이크 굽기: <b>Medium, please.</b> (중간으로 구워주세요.)",
+                    "8. 더 필요한 거 없냐고 물을 때: <b>That's all.</b> (그게 전부입니다.)",
+                    "9. 화장실 어딨나요: <b>Where is the restroom?</b>",
+                    "10. 치워주세요: <b>Can you clear the table?</b>",
+                    "11. 계산서 주세요: <b>Can I have the bill?</b> (또는 Check, please)",
+                    "12. 포장해 주세요: <b>To go, please.</b>",
+                    "13. 남은 음식 포장: <b>Can I get a box?</b>",
+                    "14. 맛있었어요: <b>It was delicious!</b>",
+                    "15. 식당 영어를 마스터했습니다! 퀴즈로 넘어갑니다."
+                ],
+                quizzes: [
+                    { q: "두 명입니다.", opts: ["Two people, please.", "We are two."], a: 0 },
+                    { q: "주문할 때 쓰는 마법의 패턴은?", opts: ["Can I have ~?", "Can you have ~?"], a: 0 },
+                    { q: "물 좀 주시겠어요?", opts: ["Can I have some water?", "Give me water."], a: 0 },
+                    { q: "주문할 준비 됐어요.", opts: ["I'm ready to order.", "I want food."], a: 0 },
+                    { q: "이거 주세요 (메뉴를 가리키며).", opts: ["I will have this.", "Look at this."], a: 0 },
+                    { q: "화장실이 어디죠?", opts: ["Where is the restroom?", "Where is water?"], a: 0 },
+                    { q: "계산서 좀 주시겠어요?", opts: ["Can I have the bill?", "Can I have money?"], a: 0 },
+                    { q: "더 필요한 거 없냐는 질문에 '그게 다예요'", opts: ["That's all.", "Everything."], a: 0 },
+                    { q: "스테이크 중간으로 구워주세요.", opts: ["Medium, please.", "Middle, please."], a: 0 },
+                    { q: "가지고 갈게요 (포장).", opts: ["To go, please.", "For here, please."], a: 0 },
+                    { q: "남은 음식 포장할 박스 주세요.", opts: ["Can I get a box?", "Give me box."], a: 0 },
+                    { q: "음식 맛있었어요!", opts: ["It was delicious!", "It was bad!"], a: 0 },
+                    { q: "메뉴판 좀 주시겠어요?", opts: ["Can I have a menu?", "Where is menu?"], a: 0 },
+                    { q: "테이블 좀 치워주시겠어요?", opts: ["Can you clear the table?", "Clean it."], a: 0 },
+                    { q: "식당에 들어갈 때 인원수 말하기", opts: ["숫자 + people, please", "숫자 + human"], a: 0 }
+                ],
+                test: [
+                    { q: "식당에서 자리에 앉아 메뉴판을 받고 물을 주문하는 과정", opts: ["Can I have a menu? -> Can I have some water?", "Give me menu -> Give me water"], a: 0 },
+                    { q: "식사를 다 마치고 남은 음식을 포장한 뒤 계산하는 과정", opts: ["Can I get a box? -> Can I have the bill?", "To go -> That's all"], a: 0 },
+                    { q: "식당 영어를 관통하는 가장 중요한 핵심 패턴은?", opts: ["Can I have ~ ?", "I am ~"], a: 0 }
+                ]
+            },
+            // [💡 개발자 메모: 여기에 3강부터 20강(Native)까지 위 형식과 동일하게 추가하시면 됩니다!]
+            { id: 3, level: "Intermediate", title: "Level 3. 공항 & 길찾기 (준비중)", concepts: ["준비중..."], quizzes: [], test: [] },
+            { id: 4, level: "Advanced", title: "Level 20. 원어민처럼 농담하기 (준비중)", concepts: ["준비중..."], quizzes: [], test: [] }
+        ];
+
+        // --------------------------------------------------------
+        // 미션(Quest) 데이터
+        // --------------------------------------------------------
+        const quests = [
+            { id: 'q1', title: "첫 걸음", desc: "첫 번째 강좌(Level 1) 테스트 통과하기", targetCourse: 1, reward: 500 },
+            { id: 'q2', title: "식도락가", desc: "Level 2 식당 주문 테스트 통과하기", targetCourse: 2, reward: 500 },
+            { id: 'q3', title: "포인트 부자", desc: "총 1000 포인트 달성하기", targetPoint: 1000, reward: 1000 }
+        ];
+
+        // 상태 변수
+        let currentCourseObj = null;
+        let currentMode = ''; // 'concept', 'quiz', 'test'
+        let slideIndex = 0;
+        let correctCount = 0;
+
+        // --- 로그인 / 회원가입 로직 ---
         window.handleSignUp = async () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const e = document.getElementById('email').value, p = document.getElementById('password').value;
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                // 새 유저 데이터베이스 생성
-                await setDoc(doc(db, "users", userCredential.user.uid), { points: 0 });
-                alert("회원가입 성공! 환영합니다 아빠!");
-            } catch (error) {
-                showError("회원가입 오류: 이메일 형식을 확인하거나 비밀번호를 6자리 이상 입력하세요.");
-            }
+                const cred = await createUserWithEmailAndPassword(auth, e, p);
+                await setDoc(doc(db, "users", cred.user.uid), { points: 0, completedCourses: [], questsCompleted: [] });
+                alert("가입 성공! 아빠 파이팅!");
+            } catch (err) { document.getElementById('auth-error').innerText = "가입 오류: " + err.message; document.getElementById('auth-error').classList.remove('hidden'); }
         };
 
         window.handleLogin = async () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-            } catch (error) {
-                showError("로그인 실패: 이메일과 비밀번호를 다시 확인해주세요.");
-            }
+            const e = document.getElementById('email').value, p = document.getElementById('password').value;
+            try { await signInWithEmailAndPassword(auth, e, p); } 
+            catch (err) { document.getElementById('auth-error').innerText = "로그인 실패!"; document.getElementById('auth-error').classList.remove('hidden'); }
         };
 
-        window.handleLogout = () => signOut(auth);
-
-        function showError(msg) {
-            const errEl = document.getElementById('auth-error');
-            errEl.innerText = msg;
-            errEl.classList.remove('hidden');
-        }
-
-        // 로그인 상태 감지기 (항상 켜져있음)
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 
-                // Firestore에서 점수 불러오기
                 const docSnap = await getDoc(doc(db, "users", user.uid));
-                if (docSnap.exists()) {
-                    userData = docSnap.data();
-                    document.getElementById('user-points').innerText = userData.points;
-                }
+                if (docSnap.exists()) userData = docSnap.data();
+                if(!userData.completedCourses) userData.completedCourses = [];
+                if(!userData.questsCompleted) userData.questsCompleted = [];
+                
+                updateUI();
+                renderCourses();
+                renderQuests();
+                lucide.createIcons();
             } else {
-                currentUser = null;
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('main-app').classList.add('hidden');
             }
         });
 
-        // 점수 추가 함수 (Firebase에도 저장)
-        window.addPoints = async (amount) => {
-            userData.points += amount;
-            document.getElementById('user-points').innerText = userData.points;
-            if(currentUser) {
-                await setDoc(doc(db, "users", currentUser.uid), { points: userData.points }, { merge: true });
-            }
-        };
+        const updateUI = () => { document.getElementById('user-points').innerText = userData.points; };
+        const saveUserData = async () => { if(currentUser) await setDoc(doc(db, "users", currentUser.uid), userData, { merge: true }); };
 
-        // --- 탭 UI 전환 로직 ---
-        window.changeTab = (tabName) => {
+        // --- 탭 전환 ---
+        window.changeTab = (tab) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('Tab-' + tabName).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-btn').forEach(el => {
-                el.classList.remove('text-emerald-600');
-                el.classList.add('text-slate-400');
-            });
-            document.querySelector('.tab-' + tabName).classList.replace('text-slate-400', 'text-emerald-600');
+            document.getElementById('Tab-' + tab).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.replace('text-blue-600', 'text-slate-400'));
+            document.querySelector('.tab-' + tab).classList.replace('text-slate-400', 'text-blue-600');
         };
 
-        // --- 종합 테스트 임시 로직 ---
-        window.startTest = () => {
-            alert('테스트가 시작됩니다! (이 부분은 향후 객관식 문제 10개 세트로 확장할 수 있습니다.)');
-        };
-
-        // --- 팝송 데이터베이스 (원하시는 곡 추가) ---
-        const songs = [
-            { id: 1, title: "I'm Not The Only One", artist: "Sam Smith", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", lyrics: "You say I'm crazy, cause you don't think I know what you've [     ]", answer: "done" },
-            { id: 2, title: "There's Nothing Holdin' Me Back", artist: "Shawn Mendes", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", lyrics: "I wanna follow where she goes, I think about her and she [     ]", answer: "knows" },
-            { id: 3, title: "7 Years", artist: "Lukas Graham", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", lyrics: "Once I was seven years old, my momma told me Go make yourself some [     ] or you'll be lonely", answer: "friends" },
-            { id: 4, title: "Yesterday", artist: "The Beatles", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", lyrics: "Yesterday, all my troubles seemed so far [     ]", answer: "away" },
-            { id: 5, title: "Piano Man", artist: "Billy Joel", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", lyrics: "Sing us a song, you're the piano [     ]", answer: "man" },
-            { id: 6, title: "Dancing Queen", artist: "ABBA", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", lyrics: "You can dance, you can jive, having the time of your [     ]", answer: "life" },
-            { id: 7, title: "Let It Be", artist: "The Beatles", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", lyrics: "When I find myself in times of [     ], Mother Mary comes to me", answer: "trouble" },
-            { id: 8, title: "Shape of You", artist: "Ed Sheeran", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", lyrics: "I'm in love with the shape of [     ]", answer: "you" },
-            { id: 9, title: "Sugar", artist: "Maroon 5", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", lyrics: "Yes please, won't you come and put it down on [     ]", answer: "me" },
-            { id: 10, title: "Just The Way You Are", artist: "Bruno Mars", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3", lyrics: "When I see your [     ], there's not a thing that I would change", answer: "face" }
-            // 💡 여기에 11번부터 50번까지 쉼표(,)를 찍고 계속 추가하시면 됩니다!
-        ];
-
-        let currentSong = null;
-
-        // 음악 목록 화면에 그리기
-        const renderSongs = () => {
-            const list = document.getElementById('song-list');
-            songs.forEach(song => {
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left p-4 bg-white rounded-xl shadow-sm border border-slate-100 flex items-center justify-between hover:border-emerald-400";
-                btn.innerHTML = `
-                    <div>
-                        <p class="font-bold text-slate-800 text-lg">${song.title}</p>
-                        <p class="text-xs text-slate-500">${song.artist}</p>
+        // --- 강좌 렌더링 ---
+        function renderCourses() {
+            const list = document.getElementById('course-list');
+            list.innerHTML = '';
+            courses.forEach((c, idx) => {
+                const isCompleted = userData.completedCourses.includes(c.id);
+                // 1강이거나 이전 강좌를 완료했으면 해금
+                const isUnlocked = idx === 0 || userData.completedCourses.includes(courses[idx-1].id);
+                
+                list.innerHTML += `
+                    <div onclick="${isUnlocked ? `startCourse(${c.id})` : ''}" class="course-card glass p-6 rounded-3xl flex justify-between items-center border-2 ${isUnlocked ? 'border-blue-100 hover:border-blue-500 cursor-pointer' : 'locked'}">
+                        <div>
+                            <span class="text-xs font-bold ${isCompleted ? 'text-green-500' : 'text-blue-500'} mb-1 block">${c.level}</span>
+                            <h3 class="font-black text-lg text-slate-800">${c.title}</h3>
+                            <p class="text-sm font-bold mt-2 ${isCompleted ? 'text-green-600' : 'text-slate-400'}">
+                                ${isCompleted ? '✅ 수료 완료' : (isUnlocked ? '📖 학습 가능' : '🔒 이전 단계를 깨세요')}
+                            </p>
+                        </div>
+                        <i data-lucide="${isCompleted ? 'check-circle' : (isUnlocked ? 'play-circle' : 'lock')}" class="w-8 h-8 ${isCompleted ? 'text-green-500' : 'text-slate-300'}"></i>
                     </div>
-                    <i data-lucide="play-circle" class="w-8 h-8 text-emerald-500"></i>
                 `;
-                btn.onclick = () => openPlayer(song);
-                list.appendChild(btn);
             });
-        };
+            lucide.createIcons();
+        }
 
-        window.openPlayer = (song) => {
-            currentSong = song;
-            document.getElementById('song-list').classList.add('hidden');
-            const player = document.getElementById('music-player');
-            player.classList.remove('hidden');
+        // --- 강좌 플레이어 로직 ---
+        window.startCourse = (id) => {
+            currentCourseObj = courses.find(c => c.id === id);
+            if(currentCourseObj.concepts.length < 15) { alert("업데이트 준비 중인 강좌입니다!"); return; }
             
-            document.getElementById('player-title').innerText = song.title;
-            document.getElementById('player-artist').innerText = song.artist;
-            document.getElementById('lyrics-question').innerText = song.lyrics;
-            document.getElementById('lyrics-answer').value = ""; // 초기화
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('course-player').classList.remove('hidden');
             
-            // 실제 서비스에서는 저작권 문제로 유튜브 API를 연결하거나 직접 mp3를 호스팅하셔야 합니다.
-            document.getElementById('audio-element').src = song.audioSrc; 
+            // 항상 개념학습부터
+            currentMode = 'concept';
+            slideIndex = 0;
+            renderPlayerMode();
         };
 
-        window.closePlayer = () => {
-            document.getElementById('music-player').classList.add('hidden');
-            document.getElementById('song-list').classList.remove('hidden');
-            document.getElementById('audio-element').pause(); // 노래 정지
-        };
-
-        window.checkLyrics = () => {
-            const answer = document.getElementById('lyrics-answer').value.toLowerCase().trim();
-            if(answer === currentSong.answer) {
-                alert("🎉 완벽합니다! 가사를 맞히셨어요! (+100 포인트)");
-                addPoints(100);
-                closePlayer();
-            } else {
-                alert(`❌ 아쉽네요. 다시 한번 들어보세요! (힌트: ${currentSong.answer.length}글자 영어단어)`);
+        window.exitCourse = () => {
+            if(confirm("학습을 중단하고 나가시겠습니까?")) {
+                document.getElementById('course-player').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                renderCourses();
             }
         };
 
-        // 초기화
-        lucide.createIcons();
-        renderSongs();
+        function renderPlayerMode() {
+            document.getElementById('view-concept').classList.add('hidden');
+            document.getElementById('view-quiz').classList.add('hidden');
+            document.getElementById('view-test').classList.add('hidden');
+
+            if(currentMode === 'concept') {
+                document.getElementById('player-mode-title').innerText = "개념 학습 (1/3)";
+                document.getElementById('view-concept').classList.remove('hidden');
+                renderConcept();
+            } else if(currentMode === 'quiz') {
+                document.getElementById('player-mode-title').innerText = "실전 퀴즈 (2/3)";
+                document.getElementById('view-quiz').classList.remove('hidden');
+                correctCount = 0;
+                renderQuiz();
+            } else if(currentMode === 'test') {
+                document.getElementById('player-mode-title').innerText = "최종 관문 (3/3)";
+                document.getElementById('view-test').classList.remove('hidden');
+                correctCount = 0;
+                renderTest();
+            }
+        }
+
+        // 1. 개념 뷰
+        window.prevConcept = () => { if(slideIndex > 0) { slideIndex--; renderConcept(); } };
+        window.nextConcept = () => {
+            if(slideIndex < currentCourseObj.concepts.length - 1) {
+                slideIndex++; renderConcept();
+            } else {
+                alert("개념 학습을 마쳤습니다. 이제 15개의 퀴즈를 풀어봅시다!");
+                currentMode = 'quiz'; slideIndex = 0; renderPlayerMode();
+            }
+        };
+        function renderConcept() {
+            const total = currentCourseObj.concepts.length;
+            document.getElementById('concept-counter').innerText = `${slideIndex + 1} / ${total}`;
+            document.getElementById('concept-content').innerHTML = currentCourseObj.concepts[slideIndex];
+            document.getElementById('progress-bar').style.width = `${((slideIndex + 1) / total) * 100}%`;
+            document.getElementById('btn-prev-concept').style.visibility = slideIndex === 0 ? 'hidden' : 'visible';
+            document.getElementById('btn-next-concept').innerText = slideIndex === total - 1 ? "퀴즈 풀기!" : "다음";
+        }
+
+        // 2. 퀴즈 뷰 (15문제 연속)
+        function renderQuiz() {
+            const total = currentCourseObj.quizzes.length;
+            if(slideIndex >= total) {
+                alert(`퀴즈 완료! ${total}문제 중 ${correctCount}개 정답. 이제 대망의 최종 테스트입니다!`);
+                currentMode = 'test'; slideIndex = 0; renderPlayerMode();
+                return;
+            }
+            const qObj = currentCourseObj.quizzes[slideIndex];
+            document.getElementById('quiz-counter').innerText = `Q ${slideIndex + 1} / ${total}`;
+            document.getElementById('quiz-question').innerText = qObj.q;
+            document.getElementById('progress-bar').style.width = `${((slideIndex + 1) / total) * 100}%`;
+            
+            const optsDiv = document.getElementById('quiz-options');
+            optsDiv.innerHTML = '';
+            qObj.opts.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-5 text-left border-2 border-slate-200 rounded-2xl text-lg font-bold hover:bg-orange-50 transition-all";
+                btn.innerText = opt;
+                btn.onclick = () => handleQuizAnswer(idx, qObj.a);
+                optsDiv.appendChild(btn);
+            });
+        }
+        function handleQuizAnswer(selected, correct) {
+            if(selected === correct) { correctCount++; userData.points += 10; alert("정답! +10P"); }
+            else { alert("아쉽네요, 오답입니다."); }
+            updateUI(); saveUserData();
+            slideIndex++; renderQuiz();
+        }
+
+        // 3. 최종 테스트 뷰
+        function renderTest() {
+            const total = currentCourseObj.test.length;
+            if(slideIndex >= total) {
+                if(correctCount === total) {
+                    alert("🎉 완벽합니다! 최종 테스트를 100점으로 통과하셨습니다!");
+                    if(!userData.completedCourses.includes(currentCourseObj.id)) {
+                        userData.completedCourses.push(currentCourseObj.id);
+                        userData.points += 500; // 코스 클리어 보상
+                    }
+                    saveUserData();
+                    checkQuests();
+                    document.getElementById('course-player').classList.add('hidden');
+                    document.getElementById('main-app').classList.remove('hidden');
+                    renderCourses();
+                } else {
+                    alert(`아쉽게도 테스트를 통과하지 못했습니다. (${correctCount}/${total} 정답)\n다시 도전해보세요!`);
+                    slideIndex = 0; correctCount = 0; renderTest(); // 테스트 재시작
+                }
+                return;
+            }
+            
+            const tObj = currentCourseObj.test[slideIndex];
+            document.getElementById('test-counter').innerText = `Test ${slideIndex + 1} / ${total}`;
+            document.getElementById('test-question').innerText = tObj.q;
+            document.getElementById('progress-bar').style.width = `${((slideIndex + 1) / total) * 100}%`;
+            
+            const optsDiv = document.getElementById('test-options');
+            optsDiv.innerHTML = '';
+            tObj.opts.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full p-5 text-left border-2 border-purple-200 rounded-2xl text-lg font-bold hover:bg-purple-50 transition-all";
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(idx === tObj.a) correctCount++;
+                    slideIndex++; renderTest();
+                };
+                optsDiv.appendChild(btn);
+            });
+        }
+
+        // --- 퀘스트 로직 ---
+        function checkQuests() {
+            let changed = false;
+            quests.forEach(q => {
+                if(!userData.questsCompleted.includes(q.id)) {
+                    let conditionMet = false;
+                    if(q.targetCourse && userData.completedCourses.includes(q.targetCourse)) conditionMet = true;
+                    if(q.targetPoint && userData.points >= q.targetPoint) conditionMet = true;
+                    
+                    if(conditionMet) {
+                        userData.questsCompleted.push(q.id);
+                        userData.points += q.reward;
+                        changed = true;
+                        alert(`🏆 퀘스트 달성: ${q.title}\n보상 ${q.reward}P 획득!`);
+                    }
+                }
+            });
+            if(changed) { updateUI(); saveUserData(); renderQuests(); }
+        }
+
+        function renderQuests() {
+            const list = document.getElementById('quest-list');
+            list.innerHTML = '';
+            quests.forEach(q => {
+                const isDone = userData.questsCompleted.includes(q.id);
+                list.innerHTML += `
+                    <div class="glass p-5 rounded-2xl flex justify-between items-center ${isDone ? 'opacity-50' : 'border border-orange-200'}">
+                        <div>
+                            <h3 class="font-black text-lg ${isDone ? 'text-slate-500' : 'text-orange-600'}">${q.title}</h3>
+                            <p class="text-sm font-bold text-slate-500">${q.desc}</p>
+                            <span class="text-xs font-black text-orange-500 mt-1 inline-block">보상: ${q.reward}P</span>
+                        </div>
+                        <i data-lucide="${isDone ? 'check-circle' : 'circle-dashed'}" class="w-8 h-8 ${isDone ? 'text-slate-400' : 'text-orange-400'}"></i>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        }
     </script>
 </body>
 </html>
+
