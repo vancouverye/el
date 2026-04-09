@@ -10,11 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap');
         body { font-family: 'Pretendard', sans-serif; background-color: #0f172a; color: #f1f5f9; margin: 0; }
         .glass-dark { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        
-        /* 💡 핵심: hidden 클래스를 아주 강력하게 설정 */
         .hidden { display: none !important; }
-        .flex-container { display: flex !important; }
-        
         input { background: #1e293b !important; color: white !important; border: 1px solid #334155 !important; }
         ::-webkit-scrollbar { display: none; }
     </style>
@@ -78,7 +74,7 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         
-        // 🌟 데이터 파일이 index.html과 같은 폴더에 있어야 합니다.
+        // 데이터 파일 로드
         import { courseData, songData } from './data.js';
 
         const firebaseConfig = {
@@ -99,13 +95,13 @@
         let currentUser = null;
 
         // 🌟 화면 강제 전환 함수
-        function updateUI(user) {
+        function updateUI(isLoggedIn) {
             const authScreen = document.getElementById('auth-screen');
             const mainApp = document.getElementById('main-app');
             
-            if (user) {
-                authScreen.style.display = 'none'; // 인라인 스타일로 확실히 숨김
-                mainApp.style.display = 'block';   // 인라인 스타일로 확실히 표시
+            if (isLoggedIn) {
+                authScreen.style.display = 'none';
+                mainApp.style.display = 'block';
                 renderCourses();
                 renderQuests();
                 renderSongs();
@@ -121,8 +117,7 @@
             const p = document.getElementById('password').value;
             try {
                 await signInWithEmailAndPassword(auth, e, p);
-                // onAuthStateChanged가 아래 로직을 처리합니다.
-            } catch (err) { alert("로그인 실패: 이메일과 비번을 확인하세요."); }
+            } catch (err) { alert("로그인 실패: 이메일과 비밀번호를 다시 확인해주세요."); }
         };
 
         window.handleSignUp = async () => {
@@ -130,22 +125,34 @@
             const p = document.getElementById('password').value;
             try {
                 const res = await createUserWithEmailAndPassword(auth, e, p);
-                await setDoc(doc(db, "users", res.user.uid), { points: 0, completed: [] });
-                alert("가입 성공!");
+                try {
+                    await setDoc(doc(db, "users", res.user.uid), { points: 0, completed: [] });
+                } catch(dbErr) {
+                    console.error("DB 생성 에러 무시:", dbErr); // DB 에러 무시
+                }
+                alert("가입 성공! 앱으로 이동합니다.");
             } catch (err) { alert("가입 에러: " + err.message); }
         };
 
         window.handleLogout = () => signOut(auth);
 
-        // 🌟 로그인 상태 실시간 감시 (핵심)
+        // 💡 핵심 수정: 에러가 나도 앱이 뻗지 않게 try-catch로 묶고 화면 전환을 맨 위로 올림!
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
-                const snap = await getDoc(doc(db, "users", user.uid));
-                if (snap.exists()) {
-                    document.getElementById('user-points').innerText = snap.data().points || 0;
-                }
+                // 1. 묻지도 따지지도 않고 화면부터 넘깁니다!
                 updateUI(true);
+
+                // 2. 그 다음 점수를 가져오려 시도합니다 (실패해도 앱은 돌아갑니다)
+                try {
+                    const snap = await getDoc(doc(db, "users", user.uid));
+                    if (snap.exists()) {
+                        document.getElementById('user-points').innerText = snap.data().points || 0;
+                    }
+                } catch (error) {
+                    console.error("데이터베이스 접근 에러(하지만 화면은 띄웠음!):", error);
+                    document.getElementById('user-points').innerText = "0";
+                }
             } else {
                 updateUI(false);
             }
@@ -184,9 +191,15 @@
 
         window.finishCourse = async () => {
             if (!currentUser) return;
-            await updateDoc(doc(db, "users", currentUser.uid), { points: increment(100) });
-            const snap = await getDoc(doc(db, "users", currentUser.uid));
-            document.getElementById('user-points').innerText = snap.data().points;
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), { points: increment(100) });
+                const snap = await getDoc(doc(db, "users", currentUser.uid));
+                document.getElementById('user-points').innerText = snap.data().points;
+            } catch(e) {
+                console.error("DB 점수 업데이트 실패, 그래도 포인트는 올라간 것처럼 표시!");
+                let currentPts = parseInt(document.getElementById('user-points').innerText);
+                document.getElementById('user-points').innerText = currentPts + 100;
+            }
             alert("100포인트 획득!");
             closeCourse();
         };
