@@ -10,8 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;700;900&display=swap');
         body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .course-card.locked { filter: grayscale(100%); opacity: 0.5; pointer-events: none; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         ::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -24,17 +23,20 @@
             <div class="space-y-3">
                 <input type="email" id="email" placeholder="이메일" class="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-indigo-500 font-bold">
                 <input type="password" id="password" placeholder="비밀번호" class="w-full p-4 rounded-2xl border-2 border-slate-100 outline-none focus:border-indigo-500 font-bold">
-                <button onclick="handleLogin()" class="w-full py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-lg hover:scale-[1.02] transition-transform">로그인</button>
-                <button onclick="handleSignUp()" class="w-full py-4 bg-slate-800 text-white font-black rounded-2xl shadow-lg hover:scale-[1.02] transition-transform">신규 가입</button>
+                
+                <button onclick="handleLogin()" class="w-full py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-lg hover:scale-[1.02] transition-transform">기존 계정 로그인</button>
+                <button onclick="handleSignUp()" class="w-full py-4 bg-slate-800 text-white font-black rounded-2xl shadow-lg hover:scale-[1.02] transition-transform">신규 회원가입</button>
             </div>
-            <p id="auth-error" class="text-red-500 mt-4 text-sm font-bold hidden"></p>
         </div>
     </div>
 
     <div id="main-app" class="hidden">
         <header class="bg-white/80 backdrop-blur-md p-5 sticky top-0 z-40 flex justify-between items-center border-b border-slate-100">
-            <h1 id="header-title" class="text-xl font-black text-indigo-600">강좌 목록</h1>
-            <div class="flex items-center gap-3 bg-indigo-50 px-4 py-2 rounded-full">
+            <div class="flex items-center gap-2">
+                <h1 class="text-xl font-black text-indigo-600">진도장</h1>
+                <button onclick="handleLogout()" class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded-md font-bold">로그아웃</button>
+            </div>
+            <div class="flex items-center gap-3 bg-indigo-50 px-4 py-2 rounded-full shadow-sm">
                 <i data-lucide="zap" class="w-4 h-4 text-amber-500 fill-amber-500"></i>
                 <span id="user-points" class="text-lg font-black text-indigo-700">0</span>
             </div>
@@ -44,10 +46,12 @@
             <section id="Tab-Course" class="tab-content space-y-4">
                 <div id="course-list" class="grid gap-4"></div>
             </section>
+            
             <section id="Tab-Quest" class="tab-content hidden space-y-4">
                 <h2 class="text-2xl font-black mb-4 px-2">오늘의 도전 🏆</h2>
                 <div id="quest-list" class="space-y-3"></div>
             </section>
+            
             <section id="Tab-Music" class="tab-content hidden space-y-4">
                 <h2 class="text-2xl font-black mb-4 px-2">가사 완성하기 🎤</h2>
                 <div id="song-list" class="grid gap-3"></div>
@@ -55,16 +59,24 @@
         </main>
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-slate-200 flex justify-around py-4 px-2 z-30 shadow-2xl">
-            <button onclick="changeTab('Course')" class="nav-btn tab-Course text-indigo-600 flex flex-col items-center gap-1">
-                <i data-lucide="book-open"></i><span class="text-[10px] font-black">공부하기</span>
-            </button>
-            <button onclick="changeTab('Quest')" class="nav-btn tab-Quest text-slate-400 flex flex-col items-center gap-1">
-                <i data-lucide="trophy"></i><span class="text-[10px] font-black">퀘스트</span>
-            </button>
-            <button onclick="changeTab('Music')" class="nav-btn tab-Music text-slate-400 flex flex-col items-center gap-1">
-                <i data-lucide="mic-2"></i><span class="text-[10px] font-black">팝송퀴즈</span>
-            </button>
+            <button onclick="changeTab('Course')" class="nav-btn tab-Course text-indigo-600 flex flex-col items-center gap-1"><i data-lucide="book-open"></i><span class="text-[10px] font-black">공부하기</span></button>
+            <button onclick="changeTab('Quest')" class="nav-btn tab-Quest text-slate-400 flex flex-col items-center gap-1"><i data-lucide="trophy"></i><span class="text-[10px] font-black">퀘스트</span></button>
+            <button onclick="changeTab('Music')" class="nav-btn tab-Music text-slate-400 flex flex-col items-center gap-1"><i data-lucide="mic-2"></i><span class="text-[10px] font-black">팝송퀴즈</span></button>
         </nav>
+    </div>
+
+    <div id="course-player" class="hidden fixed inset-0 bg-white z-50 flex flex-col">
+        <header class="bg-indigo-600 text-white p-5 flex justify-between items-center shadow-md">
+            <h2 id="cp-title" class="font-black text-lg">강의 제목</h2>
+            <button onclick="closeCourse()" class="font-bold bg-indigo-800 px-3 py-1 rounded-lg">닫기</button>
+        </header>
+        <div class="flex-1 overflow-y-auto p-6 pb-24 bg-slate-50">
+            <h3 class="font-black text-xl mb-4 text-slate-800">핵심 표현 외우기</h3>
+            <div id="cp-concepts" class="space-y-3"></div>
+        </div>
+        <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-200">
+            <button onclick="finishCourse()" class="w-full bg-indigo-600 text-white font-black text-xl py-4 rounded-xl shadow-lg hover:bg-indigo-500">다 외웠다! (+100P)</button>
+        </div>
     </div>
 
     <div id="music-player" class="hidden fixed inset-0 bg-slate-900 z-50 flex flex-col text-white">
@@ -78,21 +90,18 @@
                 <h2 id="m-title" class="text-2xl font-black text-indigo-400">제목</h2>
                 <p id="m-artist" class="text-white/70 font-bold">아티스트</p>
             </div>
-            <div id="m-lyrics" class="flex-1 overflow-y-auto bg-white/5 rounded-3xl p-6 text-xl leading-relaxed font-medium mb-6 border border-white/10"></div>
+            <div id="m-lyrics" class="flex-1 overflow-y-auto bg-white/5 rounded-3xl p-6 text-lg leading-relaxed font-medium mb-6 border border-white/10"></div>
             <div id="m-inputs" class="space-y-3 mb-4"></div>
-            <button onclick="checkMusicAnswer()" class="w-full py-5 bg-indigo-500 rounded-2xl font-black text-xl shadow-xl hover:bg-indigo-400 transition-colors">정답 확인</button>
+            <button onclick="checkMusicAnswer()" class="w-full py-4 bg-indigo-500 rounded-2xl font-black text-xl shadow-xl hover:bg-indigo-400 transition-colors">정답 확인</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        
-        // 데이터 파일 로드
         import { courseData, songData } from './data.js';
 
-        // 🌟 아버님이 주신 설정값 적용
         const firebaseConfig = {
   apiKey: "AIzaSyAKGHjP7QIJbYA3eVBzMxUnGmu7_b9JYpQ",
   authDomain: "ellearn-5573c.firebaseapp.com",
@@ -108,30 +117,61 @@
         const db = getFirestore(app);
 
         let user = null;
-        let userData = { points: 0, completed: [] };
-        let activeTab = localStorage.getItem('activeTab') || 'Course';
+        let userData = { points: 0, completed: [], quests: [] };
 
-        // --- 전역 함수 등록 (window.를 붙여야 HTML 버튼이 인식합니다) ---
+        // 🌟 1. 로그인/회원가입 완벽 제어
         window.handleSignUp = async () => {
             const e = document.getElementById('email').value;
             const p = document.getElementById('password').value;
+            if(!e || !p) return alert("이메일과 비밀번호를 입력해주세요.");
             try {
                 const cred = await createUserWithEmailAndPassword(auth, e, p);
-                await setDoc(doc(db, "users", cred.user.uid), { points: 0, completed: [] });
-                alert("가입을 환영합니다, 아버님!");
+                await setDoc(doc(db, "users", cred.user.uid), { points: 0, completed: [], quests: [] });
+                alert("가입 성공! 환영합니다.");
             } catch (err) { alert("가입 실패: " + err.message); }
         };
 
         window.handleLogin = async () => {
             const e = document.getElementById('email').value;
             const p = document.getElementById('password').value;
-            try { await signInWithEmailAndPassword(auth, e, p); } 
-            catch (err) { alert("로그인 정보를 확인해주세요."); }
+            if(!e || !p) return alert("이메일과 비밀번호를 입력해주세요.");
+            try {
+                await signInWithEmailAndPassword(auth, e, p);
+                alert("로그인 되었습니다!");
+            } catch (err) {
+                alert("이메일이나 비밀번호가 틀렸습니다.");
+                console.error(err);
+            }
         };
 
+        window.handleLogout = async () => {
+            await signOut(auth);
+            window.location.reload(); // 로그아웃 후 화면 새로고침
+        };
+
+        // 🌟 상태 감지 (로그인 시 데이터 불러오기)
+        onAuthStateChanged(auth, async (u) => {
+            if (u) {
+                user = u;
+                const snap = await getDoc(doc(db, "users", u.uid));
+                if (snap.exists()) userData = snap.data();
+                if (!userData.quests) userData.quests = [];
+                
+                document.getElementById('user-points').innerText = userData.points.toLocaleString();
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                
+                renderCourses();
+                renderQuests();
+                renderSongs();
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+            }
+        });
+
+        // 🌟 2. 탭 전환
         window.changeTab = (tab) => {
-            activeTab = tab;
-            localStorage.setItem('activeTab', tab);
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('Tab-' + tab).classList.remove('hidden');
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.replace('text-indigo-600', 'text-slate-400'));
@@ -139,43 +179,76 @@
             lucide.createIcons();
         };
 
-        // --- 로그인 상태 감지 및 UI 업데이트 ---
-        onAuthStateChanged(auth, async (u) => {
-            if (u) {
-                user = u;
-                const snap = await getDoc(doc(db, "users", u.uid));
-                if (snap.exists()) userData = snap.data();
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-                renderCourses();
-                renderSongs();
-                changeTab(activeTab);
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('main-app').classList.add('hidden');
-            }
-        });
-
+        // 🌟 3. 코스 목록 렌더링 및 클릭 이벤트
         function renderCourses() {
-            const container = document.getElementById('course-list');
-            container.innerHTML = courseData.map((c, idx) => `
-                <div class="course-card glass p-6 rounded-[1.5rem] flex justify-between items-center border-2 border-white">
+            document.getElementById('course-list').innerHTML = courseData.map((c, idx) => `
+                <div onclick="openCourse(${idx})" class="course-card glass p-6 rounded-[1.5rem] flex justify-between items-center border-2 border-white cursor-pointer hover:bg-indigo-50 transition-colors">
                     <div>
                         <span class="text-[10px] font-black px-2 py-1 bg-indigo-100 text-indigo-600 rounded-md mb-2 inline-block">${c.level}</span>
                         <h3 class="font-black text-lg">${c.title}</h3>
                     </div>
-                    <i data-lucide="play-circle" class="text-indigo-500"></i>
+                    <i data-lucide="play-circle" class="text-indigo-500 w-8 h-8"></i>
                 </div>
             `).join('');
             lucide.createIcons();
         }
 
+        // 코스 열기 (새로 추가)
+        window.openCourse = (idx) => {
+            const course = courseData[idx];
+            if (!course.concepts || course.concepts[0] === "...") return alert("아버님, 이 강의는 곧 업데이트 됩니다!");
+            
+            document.getElementById('course-player').classList.remove('hidden');
+            document.getElementById('cp-title').innerText = course.title;
+            document.getElementById('cp-concepts').innerHTML = course.concepts.map(txt => `
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 text-lg">${txt}</div>
+            `).join('');
+        };
+        window.closeCourse = () => document.getElementById('course-player').classList.add('hidden');
+        window.finishCourse = async () => {
+            alert("훌륭합니다! 100포인트를 획득하셨습니다.");
+            userData.points += 100;
+            await setDoc(doc(db, "users", user.uid), userData);
+            document.getElementById('user-points').innerText = userData.points.toLocaleString();
+            closeCourse();
+        };
+
+        // 🌟 4. 퀘스트 시스템 작동
+        const questData = [
+            { id: 101, title: "오늘의 첫 로그인!", reward: 50 },
+            { id: 102, title: "강의 1개 이상 열어보기", reward: 100 },
+            { id: 103, title: "영어 팝송 도전하기", reward: 150 }
+        ];
+
+        function renderQuests() {
+            document.getElementById('quest-list').innerHTML = questData.map(q => {
+                const isDone = userData.quests.includes(q.id);
+                return `
+                <div class="glass p-5 rounded-2xl flex justify-between items-center border ${isDone ? 'bg-slate-100 opacity-50' : 'border-amber-200 bg-amber-50'}">
+                    <span class="font-black ${isDone ? 'text-slate-400' : 'text-slate-800'}">${q.title}</span>
+                    <button onclick="claimQuest(${q.id}, ${q.reward})" class="px-4 py-2 font-black rounded-lg ${isDone ? 'bg-slate-300 text-white cursor-not-allowed' : 'bg-amber-400 text-white hover:bg-amber-500'}" ${isDone ? 'disabled' : ''}>
+                        ${isDone ? '완료' : '+' + q.reward + 'P'}
+                    </button>
+                </div>
+                `;
+            }).join('');
+        }
+
+        window.claimQuest = async (qid, reward) => {
+            userData.points += reward;
+            userData.quests.push(qid);
+            await setDoc(doc(db, "users", user.uid), userData);
+            document.getElementById('user-points').innerText = userData.points.toLocaleString();
+            alert(`${reward} 포인트 획득! 멋지십니다.`);
+            renderQuests();
+        };
+
+        // 🌟 5. 음악 기능
         function renderSongs() {
-            const container = document.getElementById('song-list');
-            container.innerHTML = songData.map((s, idx) => `
-                <div onclick="openMusic(${idx})" class="glass p-5 rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-indigo-50">
+            document.getElementById('song-list').innerHTML = songData.map((s, idx) => `
+                <div onclick="openMusic(${idx})" class="glass p-5 rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-indigo-50 border border-slate-100">
                     <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-500"><i data-lucide="music"></i></div>
-                    <div><h3 class="font-black">${s.title}</h3><p class="text-xs font-bold text-slate-400">${s.artist}</p></div>
+                    <div><h3 class="font-black text-lg">${s.title}</h3><p class="text-sm font-bold text-slate-400">${s.artist}</p></div>
                 </div>
             `).join('');
             lucide.createIcons();
@@ -189,22 +262,19 @@
             document.getElementById('m-title').innerText = s.title;
             document.getElementById('m-artist').innerText = s.artist;
             document.getElementById('m-lyrics').innerHTML = s.lyrics;
-            const inputArea = document.getElementById('m-inputs');
-            inputArea.innerHTML = s.blanks.map((_, i) => `<input type="text" id="ans-${i}" placeholder="${i+1}번 정답 입력" class="w-full p-4 rounded-xl bg-white/10 border border-white/20 text-white font-bold outline-none focus:border-indigo-400">`).join('');
+            document.getElementById('m-inputs').innerHTML = s.blanks.map((_, i) => `<input type="text" id="ans-${i}" placeholder="${i+1}번 빈칸 정답" class="w-full p-4 rounded-xl bg-white/10 border border-white/20 text-white font-bold outline-none focus:border-indigo-400">`).join('');
         };
-
         window.exitMusic = () => document.getElementById('music-player').classList.add('hidden');
-
         window.checkMusicAnswer = async () => {
             const s = songData[currentSongIdx];
             const isCorrect = s.blanks.every((ans, i) => document.getElementById(`ans-${i}`).value.trim().toLowerCase() === ans.toLowerCase());
             if(isCorrect) {
-                alert("완벽합니다! +200점!");
+                alert("정답입니다! 가사를 완벽히 이해하셨네요! (+200P)");
                 userData.points += 200;
                 await setDoc(doc(db, "users", user.uid), userData);
                 document.getElementById('user-points').innerText = userData.points.toLocaleString();
                 exitMusic();
-            } else { alert("다시 한 번 가사를 잘 들어보세요!"); }
+            } else { alert("조금 틀렸습니다. 가사를 다시 한 번 천천히 읽어보세요!"); }
         };
     </script>
 </body>
